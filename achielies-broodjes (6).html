@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Achilie's Broodjes — Bouw jouw perfecte broodje</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --crust:#8a5a2c;
+    --crust-dark:#5c3a1b;
+    --wheat:#e3a85a;
+    --wheat-light:#f3cf94;
+    --cream:#faf1e0;
+    --cream-deep:#f1e2c6;
+    --tomato:#d5573c;
+    --basil:#5f8a4f;
+    --cheese:#f0bd45;
+    --ink:#2c2013;
+    --ink-soft:#6b5b48;
+    --glass:rgba(255,255,255,0.55);
+    --glass-border:rgba(255,255,255,0.7);
+    --shadow-soft:0 20px 40px -18px rgba(92,58,27,0.35);
+    --radius-lg:28px;
+    --radius-md:18px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    color:var(--ink);
+    -webkit-tap-highlight-color:transparent;
+    background:
+      radial-gradient(1200px 600px at 15% -10%, #fff7e9 0%, transparent 60%),
+      radial-gradient(1000px 700px at 100% 0%, #ffe9c9 0%, transparent 55%),
+      linear-gradient(180deg, var(--cream) 0%, var(--cream-deep) 100%);
+    min-height:100vh;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  .display{font-family:'Fraunces', Georgia, serif;}
+
+  #baguette-field{
+    position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden;
+  }
+  .baguette{
+    position:absolute; top:-120px; will-change:transform;
+    filter:drop-shadow(0 14px 18px rgba(92,58,27,0.28));
+    animation-name:fall, spin;
+    animation-timing-function:linear;
+    animation-iteration-count:infinite;
+    pointer-events:auto;
+    cursor:pointer;
+    user-select:none;
+    transition:transform .25s cubic-bezier(.34,1.8,.64,1);
+  }
+  .baguette:hover{ transform:scale(1.12); }
+  .baguette.pop{
+    animation:none !important;
+    transform:translateY(0) scale(1.6) rotate(25deg) !important;
+    opacity:0;
+    transition:transform .45s cubic-bezier(.34,2,.64,1), opacity .45s ease;
+  }
+  @keyframes fall{
+    from{ top:-140px; }
+    to{ top:110vh; }
+  }
+  @keyframes spin{
+    from{ transform:rotate(0deg); }
+    to{ transform:rotate(360deg); }
+  }
+  .sparkle{
+    position:fixed; z-index:5; font-size:20px; pointer-events:none;
+    animation:sparkleOut .6s ease-out forwards;
+  }
+  @keyframes sparkleOut{
+    0%{ opacity:1; transform:translate(0,0) scale(0.6); }
+    100%{ opacity:0; transform:translate(var(--sx,20px), var(--sy,-30px)) scale(1.3); }
+  }
+
+  .wrap{ position:relative; z-index:1; max-width:1360px; margin:0 auto; padding:0 28px 80px; }
+
+  header.hero{
+    text-align:center; padding:64px 20px 28px; position:relative;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:13px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--crust-dark); font-weight:700;
+    background:var(--glass); border:1px solid var(--glass-border);
+    padding:8px 18px; border-radius:999px; backdrop-filter:blur(8px);
+    box-shadow:var(--shadow-soft);
+  }
+  h1.title{
+    font-size:clamp(38px,6vw,68px); line-height:1.02; margin:22px 0 14px;
+    color:var(--crust-dark); font-weight:700; letter-spacing:-0.01em;
+  }
+  h1.title em{ font-style:italic; color:var(--tomato); }
+  .subtitle{ color:var(--ink-soft); font-size:18px; max-width:520px; margin:0 auto; font-weight:500;}
+
+  .builder-grid{
+    display:grid;
+    grid-template-columns:300px 1fr 340px;
+    gap:22px;
+    margin-top:44px;
+    align-items:start;
+  }
+  @media (max-width:1100px){
+    .builder-grid{ grid-template-columns:1fr; }
+  }
+
+  .panel{
+    background:var(--glass);
+    border:1px solid var(--glass-border);
+    border-radius:var(--radius-lg);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    box-shadow:var(--shadow-soft);
+  }
+
+  .ingredients-panel{ padding:20px; position:sticky; top:20px; max-height:calc(100vh - 40px); display:flex; flex-direction:column;}
+  .tabs{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+  .tab{
+    border:none; background:rgba(255,255,255,0.5); color:var(--ink-soft);
+    padding:8px 12px; border-radius:999px; font-weight:700; font-size:13px;
+    cursor:pointer; transition:all .2s ease; display:flex; align-items:center; gap:6px;
+  }
+  .tab.active{ background:var(--crust-dark); color:#fff; box-shadow:0 8px 16px -8px rgba(92,58,27,0.6);}
+  .tab:hover:not(.active){ background:rgba(255,255,255,0.85); }
+
+  .ingredient-list{ overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding-right:4px; flex:1; }
+  .ingredient-list::-webkit-scrollbar{ width:6px; }
+  .ingredient-list::-webkit-scrollbar-thumb{ background:var(--wheat); border-radius:10px; }
+
+  .ing-card{
+    display:flex; align-items:center; gap:12px;
+    background:rgba(255,255,255,0.65); border:1px solid rgba(255,255,255,0.8);
+    border-radius:16px; padding:10px 12px; cursor:grab;
+    transition:transform .18s cubic-bezier(.34,1.6,.64,1), box-shadow .18s ease, border-color .18s ease;
+  }
+  .ing-card:hover{ transform:translateY(-3px) scale(1.02); box-shadow:0 14px 22px -14px rgba(92,58,27,0.5); border-color:var(--wheat);}
+  .ing-card.dragging{ opacity:.35; }
+  .ing-card .emoji{ font-size:26px; filter:drop-shadow(0 3px 3px rgba(0,0,0,.12)); }
+  .ing-card .meta{ flex:1; min-width:0; }
+  .ing-card .name{ font-weight:700; font-size:14px; color:var(--ink); }
+  .ing-card .price{ font-size:12px; color:var(--ink-soft); font-weight:600; }
+  .ing-card .add-btn{
+    border:none; background:var(--crust-dark); color:#fff; width:30px; height:30px;
+    border-radius:50%; font-size:17px; cursor:pointer; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .15s ease, background .15s ease;
+  }
+  .ing-card .add-btn:hover{ background:var(--tomato); transform:scale(1.12) rotate(90deg); }
+
+  .stage-panel{ padding:26px; display:flex; flex-direction:column; align-items:center; gap:20px; }
+  .drop-zone{
+    width:100%; max-width:340px; min-height:340px;
+    border-radius:34px;
+    display:flex; flex-direction:column-reverse; align-items:center;
+    padding:22px 14px;
+    position:relative;
+    transition:box-shadow .2s ease, background .2s ease;
+  }
+  .drop-zone.dragover{
+    box-shadow:0 0 0 3px var(--tomato) inset, 0 0 40px rgba(213,87,60,0.25);
+    background:rgba(255,255,255,0.35);
+    border-radius:34px;
+  }
+  .empty-hint{
+    color:var(--ink-soft); text-align:center; font-weight:600; font-size:14px;
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:70%;
+    opacity:.75;
+  }
+
+  .layer{
+    width:100%; border-radius:16px; position:relative;
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    font-size:13px; font-weight:800; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.35);
+    animation:layerIn .5s cubic-bezier(.2,1.4,.4,1) both;
+    margin-top:-6px;
+    letter-spacing:.01em;
+    box-shadow:0 0 0 2px rgba(255,255,255,0.75), 0 3px 6px -2px rgba(43,23,16,0.25);
+    padding:0 12px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .layer:first-child{ margin-top:0; }
+  .layer .layer-emoji{ font-size:16px; filter:drop-shadow(0 1px 1px rgba(0,0,0,.3)); flex:none; }
+  .layer .layer-name{ overflow:hidden; text-overflow:ellipsis; }
+  @keyframes layerIn{
+    0%{ opacity:0; transform:translateY(-26px) scale(.7) rotate(-3deg); }
+    60%{ opacity:1; transform:translateY(4px) scale(1.04) rotate(1deg); }
+    100%{ opacity:1; transform:translateY(0) scale(1) rotate(0deg); }
+  }
+  .layer.bread-bottom{ height:38px; background:linear-gradient(180deg,var(--wheat) 0%, var(--crust) 100%); border-radius:14px 14px 40px 40px; box-shadow:inset 0 -6px 10px rgba(0,0,0,.12), 0 0 0 2px rgba(255,255,255,0.75); margin-top:0;}
+  .layer.bread-top{ height:46px; background:linear-gradient(180deg, var(--wheat-light) 0%, var(--wheat) 70%, var(--crust) 100%); border-radius:40px 40px 14px 14px; box-shadow:0 8px 14px -8px rgba(92,58,27,.5), 0 0 0 2px rgba(255,255,255,0.75); position:relative; z-index:5;}
+  .layer.sauce{ height:26px; opacity:.96; color:var(--ink); text-shadow:0 1px 2px rgba(255,255,255,.5); font-size:12px; }
+  .layer.groente{ height:30px; }
+  .layer.beleg{ height:34px; }
+  .layer.extra{ height:30px; }
+
+  .stage-caption{ text-align:center; }
+  .stage-caption h2{ font-family:'Fraunces',serif; font-size:22px; margin:0 0 4px; color:var(--crust-dark); }
+  .stage-caption p{ margin:0; color:var(--ink-soft); font-size:13px; font-weight:600;}
+
+  .order-list{ width:100%; max-width:400px; }
+  .order-list h3{ font-family:'Fraunces',serif; font-size:16px; color:var(--crust-dark); margin:0 0 10px; text-align:left;}
+  .order-empty{ color:var(--ink-soft); font-size:13px; font-weight:600; text-align:center; padding:14px; }
+  .order-row{
+    display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.6);
+    border:1px solid rgba(255,255,255,0.8); border-radius:14px; padding:8px 10px; margin-bottom:8px;
+    cursor:grab; transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .order-row:hover{ box-shadow:0 10px 18px -12px rgba(92,58,27,.5); }
+  .order-row.dragging{ opacity:.3; }
+  .order-row .handle{ color:var(--ink-soft); font-size:14px; }
+  .order-row .emoji{ font-size:18px; }
+  .order-row .name{ flex:1; font-size:13px; font-weight:700; }
+  .order-row .price{ font-size:12px; color:var(--ink-soft); font-weight:700; }
+  .order-row .remove{
+    border:none; background:transparent; color:var(--tomato); font-size:16px; cursor:pointer;
+    width:24px; height:24px; border-radius:50%; transition:background .15s ease;
+  }
+  .order-row .remove:hover{ background:rgba(213,87,60,0.14); }
+
+  .summary-panel{ padding:26px; position:sticky; top:20px; display:flex; flex-direction:column; gap:18px; }
+  .summary-panel h3{ font-family:'Fraunces',serif; font-size:20px; margin:0; color:var(--crust-dark); }
+  .price-row{ display:flex; justify-content:space-between; font-size:14px; color:var(--ink-soft); font-weight:600; }
+  .price-total{ display:flex; justify-content:space-between; align-items:baseline; padding-top:12px; border-top:1px dashed rgba(92,58,27,0.25); }
+  .price-total .label{ font-weight:700; font-size:15px; }
+  .price-total .amount{ font-family:'Fraunces',serif; font-size:32px; color:var(--tomato); font-weight:700; transition:transform .25s cubic-bezier(.34,1.8,.64,1);}
+  .price-total .amount.bump{ transform:scale(1.18); }
+
+  .order-btn{
+    border:none; width:100%; padding:16px; border-radius:18px;
+    background:linear-gradient(135deg, var(--tomato), #b73f28);
+    color:#fff; font-weight:800; font-size:16px; cursor:pointer;
+    box-shadow:0 16px 28px -14px rgba(213,87,60,.7);
+    transition:transform .18s cubic-bezier(.34,1.6,.64,1), box-shadow .18s ease, filter .18s ease;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .order-btn:hover{ transform:translateY(-2px); box-shadow:0 20px 32px -14px rgba(213,87,60,.8); }
+  .order-btn:active{ transform:translateY(1px) scale(.98); }
+  .order-btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
+
+  .stage-panel.drop-target-active{
+    box-shadow:0 0 0 3px var(--tomato) inset, 0 0 40px rgba(213,87,60,0.3);
+  }
+  .drag-ghost{
+    position:fixed; z-index:200; pointer-events:none;
+    display:flex; align-items:center; gap:12px;
+    background:rgba(255,255,255,0.95); border:1px solid var(--wheat);
+    border-radius:16px; padding:10px 12px;
+    box-shadow:0 18px 30px -12px rgba(92,58,27,0.55);
+    transform:scale(1.06) rotate(-2deg);
+    opacity:0.95;
+  }
+  .drag-ghost .emoji{ font-size:26px; }
+  .drag-ghost .meta{ flex:1; min-width:0; }
+  .drag-ghost .name{ font-weight:700; font-size:14px; color:var(--ink); }
+  .drag-ghost .price{ font-size:12px; color:var(--ink-soft); font-weight:600; }
+  .drag-ghost.order-ghost{ padding:8px 10px; transform:scale(1.04) rotate(-1deg); }
+  .ing-card.dragging, .order-row.dragging{ opacity:.3; }
+  .order-row.drop-hint{ box-shadow:0 0 0 2px var(--wheat) inset; background:rgba(243,207,148,0.35); }
+  .ing-card{ touch-action:none; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; }
+  .order-row{ touch-action:none; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; }
+  .drag-ghost{ -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; }
+  .layer, .tab, .add-btn, .remove, .order-btn, .admin-toggle, .baguette{ -webkit-tap-highlight-color:transparent; }
+
+  .toast{
+    position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(30px);
+    background:var(--crust-dark); color:#fff; padding:16px 24px; border-radius:16px;
+    font-weight:700; font-size:14px; box-shadow:0 20px 40px -14px rgba(0,0,0,.4);
+    opacity:0; pointer-events:none; transition:all .35s cubic-bezier(.34,1.6,.64,1);
+    z-index:50; display:flex; align-items:center; gap:10px;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
+
+  footer{ text-align:center; padding:40px 20px 10px; color:var(--ink-soft); font-size:12px; font-weight:600; position:relative; z-index:1;}
+  .admin-toggle{
+    margin-top:14px; border:none; background:rgba(255,255,255,0.55); color:var(--ink-soft);
+    padding:8px 16px; border-radius:999px; font-weight:700; font-size:12px; cursor:pointer;
+    border:1px solid var(--glass-border); transition:all .2s ease;
+  }
+  .admin-toggle:hover{ background:rgba(255,255,255,0.9); color:var(--crust-dark); }
+
+  .modal-overlay{
+    display:none; position:fixed; inset:0; background:rgba(44,32,19,0.45);
+    z-index:100; align-items:center; justify-content:center; padding:20px;
+    backdrop-filter:blur(3px);
+  }
+  .modal-overlay.show{ display:flex; }
+  .modal-card{
+    background:var(--cream); border:1px solid var(--glass-border); border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-soft); padding:26px; width:100%; max-width:360px;
+  }
+  .modal-card h3{ font-family:'Fraunces',serif; margin:0 0 6px; color:var(--crust-dark); font-size:20px; }
+  .modal-card p{ margin:0 0 16px; color:var(--ink-soft); font-size:13px; font-weight:600; }
+  .modal-card input{
+    width:100%; padding:12px 14px; border-radius:14px; border:1px solid rgba(92,58,27,0.25);
+    font-size:18px; letter-spacing:6px; text-align:center; font-weight:700; color:var(--ink);
+    background:#fff; box-sizing:border-box;
+  }
+  .modal-card input:focus{ outline:2px solid var(--wheat); }
+  .modal-error{ color:var(--tomato); font-size:12px; font-weight:700; min-height:18px; margin-top:8px; }
+  .modal-actions{ display:flex; gap:10px; margin-top:6px; }
+  .modal-actions button{ flex:1; border:none; padding:12px; border-radius:14px; font-weight:800; font-size:13px; cursor:pointer; }
+  .btn-secondary{ background:rgba(0,0,0,0.06); color:var(--ink-soft); }
+  .btn-secondary:hover{ background:rgba(0,0,0,0.1); }
+  .btn-primary{ background:var(--crust-dark); color:#fff; }
+  .btn-primary:hover{ background:var(--tomato); }
+
+  .admin-card{ max-width:640px; max-height:82vh; display:flex; flex-direction:column; }
+  .admin-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+  .admin-header h3{ margin:0; }
+  .modal-close{ border:none; background:rgba(0,0,0,0.06); width:30px; height:30px; border-radius:50%; font-size:15px; cursor:pointer; color:var(--ink-soft); }
+  .modal-close:hover{ background:rgba(0,0,0,0.12); }
+  .admin-status{ font-size:13px; font-weight:600; color:var(--ink-soft); margin:10px 0; }
+  .admin-orders{ overflow-y:auto; display:flex; flex-direction:column; gap:12px; padding-right:4px; }
+  .admin-order{ background:rgba(255,255,255,0.65); border:1px solid rgba(255,255,255,0.85); border-radius:16px; padding:14px 16px; }
+  .admin-order-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
+  .admin-order-time{ font-size:11px; color:var(--ink-soft); font-weight:700; }
+  .admin-order-total{ font-family:'Fraunces',serif; font-size:18px; color:var(--tomato); font-weight:700; }
+  .admin-order-items{ font-size:13px; color:var(--ink); font-weight:600; line-height:1.5; }
+  .admin-order-empty{ text-align:center; color:var(--ink-soft); font-size:13px; font-weight:600; padding:30px 0; }
+
+  @media (max-width:640px){
+    .wrap{ padding:0 16px 60px; }
+    header.hero{ padding:44px 10px 20px; }
+    .builder-grid{ gap:16px; }
+    .ingredients-panel{ position:static; max-height:none; }
+    .summary-panel{ position:static; }
+  }
+</style>
+</head>
+<body>
+
+<div id="baguette-field"></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">🥖 Achilie's Broodjes — vers gebouwd, jouw regels</span>
+    <h1 class="title">Maak jouw <em>perfecte</em><br>broodje</h1>
+    <p class="subtitle">Sleep ingrediënten naar je broodje, herschik de laagjes zoals jij wil, en bestel in één klik.</p>
+  </header>
+
+  <section class="builder-grid">
+    <div class="panel ingredients-panel">
+      <div class="tabs" id="tabs"></div>
+      <div class="ingredient-list" id="ingredientList"></div>
+    </div>
+
+    <div class="panel stage-panel">
+      <div class="stage-caption">
+        <h2>Jouw broodje bouwt zich live op</h2>
+        <p>Sleep, tik, of klik + om ingrediënten toe te voegen</p>
+      </div>
+      <div class="drop-zone" id="dropZone">
+        <div class="empty-hint" id="emptyHint">Nog leeg — sleep hier je eerste ingrediënt naartoe 🥖</div>
+      </div>
+      <div class="order-list">
+        <h3>Jouw broodje — sleep om te herschikken</h3>
+        <div id="orderRows"></div>
+      </div>
+    </div>
+
+    <div class="panel summary-panel">
+      <h3>Overzicht</h3>
+      <div id="priceRows"></div>
+      <div class="price-total">
+        <span class="label">Totaal</span>
+        <span class="amount" id="totalAmount">€ 0,00</span>
+      </div>
+      <button class="order-btn" id="orderBtn" disabled>🛒 Bestel broodje</button>
+    </div>
+  </section>
+
+  <footer>
+    Achilie's Broodjes · vers besteld via een digitale broodjeszaak
+    <br>
+    <button class="admin-toggle" id="adminToggle">🔐 Beheer</button>
+  </footer>
+</div>
+
+<div class="modal-overlay" id="pinOverlay">
+  <div class="modal-card">
+    <h3>Beheerder toegang</h3>
+    <p>Voer de pincode in om alle bestellingen te bekijken.</p>
+    <input type="password" id="pinInput" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off">
+    <div class="modal-error" id="pinError"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="pinCancel">Annuleren</button>
+      <button class="btn-primary" id="pinSubmit">Bevestigen</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="adminOverlay">
+  <div class="modal-card admin-card">
+    <div class="admin-header">
+      <h3>📋 Alle bestellingen</h3>
+      <button class="modal-close" id="adminClose">✕</button>
+    </div>
+    <div class="admin-status" id="adminStatus"></div>
+    <div class="admin-orders" id="adminOrders"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✅ Bestelling geplaatst!</div>
+
+<script>
+(function(){
+"use strict";
+
+var CATEGORIES = [
+  { id:'brood',   label:'Brood',   tab:'🥖', layerClass:null },
+  { id:'sauzen',  label:'Sauzen',  tab:'🥫', layerClass:'sauce' },
+  { id:'groenten',label:'Groenten',tab:'🥬', layerClass:'groente' },
+  { id:'beleg',   label:'Beleg',   tab:'🥩', layerClass:'beleg' },
+  { id:'extra',   label:"Extra's", tab:'🧀', layerClass:'extra' }
+];
+
+var INGREDIENTS = {
+  brood:[
+    {id:'b1',name:'Stokbrood',price:2.20,emoji:'🥖'},
+    {id:'b2',name:'Wit broodje',price:1.80,emoji:'🍞'},
+    {id:'b3',name:'Bruin broodje',price:1.80,emoji:'🍞'},
+    {id:'b4',name:'Meergranen',price:2.00,emoji:'🌾'},
+    {id:'b5',name:'Ciabatta',price:2.10,emoji:'🥯'}
+  ],
+  beleg:[
+    {id:'m1',name:'Ham',price:1.20,emoji:'🍖',color:'#d98a6b'},
+    {id:'m2',name:'Kaas',price:1.10,emoji:'🧀',color:'#f0bd45'},
+    {id:'m3',name:'Kip',price:1.40,emoji:'🍗',color:'#e6c48a'},
+    {id:'m4',name:'Salami',price:1.30,emoji:'🌭',color:'#b8493f'},
+    {id:'m5',name:'Rosbief',price:1.60,emoji:'🥩',color:'#9c3d38'},
+    {id:'m6',name:'Tonijn',price:1.50,emoji:'🐟',color:'#8ba7bd'},
+    {id:'m7',name:'Gerookte zalm',price:2.10,emoji:'🍣',color:'#e08a72'},
+    {id:'m8',name:'Spek',price:1.30,emoji:'🥓',color:'#b5564a'}
+  ],
+  groenten:[
+    {id:'g1',name:'Sla',price:0.30,emoji:'🥬',color:'#7fa85a'},
+    {id:'g2',name:'Tomaat',price:0.40,emoji:'🍅',color:'#d5573c'},
+    {id:'g3',name:'Komkommer',price:0.35,emoji:'🥒',color:'#7fae6a'},
+    {id:'g4',name:'Wortel',price:0.30,emoji:'🥕',color:'#e6924a'},
+    {id:'g5',name:'Ui',price:0.25,emoji:'🧅',color:'#dfc9a3'},
+    {id:'g6',name:'Rode ui',price:0.30,emoji:'🧅',color:'#8a4a63'},
+    {id:'g7',name:'Paprika',price:0.35,emoji:'🫑',color:'#c9432f'},
+    {id:'g8',name:'Augurk',price:0.30,emoji:'🥒',color:'#5f8a4f'},
+    {id:'g9',name:'Maïs',price:0.35,emoji:'🌽',color:'#f0bd45'},
+    {id:'g10',name:'Rucola',price:0.40,emoji:'🌿',color:'#5f8a4f'}
+  ],
+  sauzen:[
+    {id:'s1',name:'Mayonaise',price:0.40,emoji:'🥫',color:'#f3ecd9'},
+    {id:'s2',name:'Cocktail',price:0.40,emoji:'🥫',color:'#e8a377'},
+    {id:'s3',name:'Andalouse',price:0.40,emoji:'🥫',color:'#e07a4f'},
+    {id:'s4',name:'Ketchup',price:0.35,emoji:'🥫',color:'#c1392b'},
+    {id:'s5',name:'Mosterd',price:0.35,emoji:'🥫',color:'#e0b23c'},
+    {id:'s6',name:'Samurai',price:0.45,emoji:'🥫',color:'#c94a2d'},
+    {id:'s7',name:'Curry',price:0.40,emoji:'🥫',color:'#d99a2b'},
+    {id:'s8',name:'BBQ',price:0.40,emoji:'🥫',color:'#6e4325'},
+    {id:'s9',name:'Looksaus',price:0.40,emoji:'🥫',color:'#efe6c8'}
+  ],
+  extra:[
+    {id:'e1',name:'Ei',price:0.60,emoji:'🥚',color:'#f3e2b0'},
+    {id:'e2',name:'Spiegelei',price:0.70,emoji:'🍳',color:'#f2c14e'},
+    {id:'e3',name:'Bacon',price:0.90,emoji:'🥓',color:'#b5564a'},
+    {id:'e4',name:'Cheddar',price:0.80,emoji:'🧀',color:'#e8971f'},
+    {id:'e5',name:'Mozzarella',price:0.80,emoji:'🧀',color:'#f3ecd9'},
+    {id:'e6',name:'Gebakken ajuin',price:0.60,emoji:'🧅',color:'#8a5a2c'}
+  ]
+};
+
+var activeTab = 'brood';
+var bread = null;
+var order = [];
+var uidCounter = 0;
+
+var field = document.getElementById('baguette-field');
+function spawnBaguette(){
+  var el = document.createElement('div');
+  el.className='baguette';
+  el.textContent='🥖';
+  var size = 26 + Math.random()*30;
+  var left = Math.random()*100;
+  var fallDur = 9 + Math.random()*8;
+  var spinDur = 4 + Math.random()*6;
+  var delay = Math.random()*6;
+  el.style.left = left+'vw';
+  el.style.fontSize = size+'px';
+  el.style.animationDuration = fallDur+'s, '+spinDur+'s';
+  el.style.animationDelay = '-'+delay+'s, -'+delay+'s';
+  el.addEventListener('click', function(){
+    if(el.classList.contains('pop')) return;
+    el.classList.add('pop');
+    for(var i=0;i<6;i++){
+      var s = document.createElement('div');
+      s.className='sparkle';
+      s.textContent='✨';
+      var rect = el.getBoundingClientRect();
+      s.style.left = (rect.left+rect.width/2)+'px';
+      s.style.top = (rect.top+rect.height/2)+'px';
+      s.style.setProperty('--sx', (Math.random()*80-40)+'px');
+      s.style.setProperty('--sy', (Math.random()*-80-10)+'px');
+      document.body.appendChild(s);
+      (function(sEl){ setTimeout(function(){ sEl.remove(); }, 650); })(s);
+    }
+    setTimeout(function(){ el.remove(); spawnBaguette(); }, 460);
+  });
+  field.appendChild(el);
+}
+for(var bi=0; bi<9; bi++) spawnBaguette();
+
+var tabsEl = document.getElementById('tabs');
+var listEl = document.getElementById('ingredientList');
+
+function renderTabs(){
+  tabsEl.innerHTML='';
+  CATEGORIES.forEach(function(cat){
+    var btn=document.createElement('button');
+    btn.className='tab'+(cat.id===activeTab?' active':'');
+    btn.innerHTML= cat.tab + ' ' + cat.label;
+    btn.onclick=function(){ activeTab=cat.id; renderTabs(); renderIngredients(); };
+    tabsEl.appendChild(btn);
+  });
+}
+
+function renderIngredients(){
+  listEl.innerHTML='';
+  INGREDIENTS[activeTab].forEach(function(ing){
+    var card=document.createElement('div');
+    card.className='ing-card';
+    card.innerHTML =
+      '<span class="emoji">'+ing.emoji+'</span>'+
+      '<div class="meta">'+
+        '<div class="name">'+ing.name+'</div>'+
+        '<div class="price">+ € '+ing.price.toFixed(2).replace('.',',')+'</div>'+
+      '</div>'+
+      '<button class="add-btn" aria-label="Toevoegen">+</button>';
+    card.querySelector('.add-btn').addEventListener('click', function(){ addIngredient(activeTab, ing.id, true); });
+    attachIngredientDrag(card, activeTab, ing);
+    listEl.appendChild(card);
+  });
+}
+
+var stagePanelEl = document.querySelector('.stage-panel');
+var DRAG_THRESHOLD = 6;
+
+function createGhost(referenceEl, innerHtml, extraClass){
+  var ghost = document.createElement('div');
+  ghost.className = 'drag-ghost' + (extraClass ? ' '+extraClass : '');
+  ghost.innerHTML = innerHtml;
+  var rect = referenceEl.getBoundingClientRect();
+  ghost.style.width = rect.width + 'px';
+  document.body.appendChild(ghost);
+  return ghost;
+}
+
+function pointInRect(x, y, rect){
+  return x>=rect.left && x<=rect.right && y>=rect.top && y<=rect.bottom;
+}
+
+function attachIngredientDrag(card, catId, ing){
+  card.addEventListener('pointerdown', function(e){
+    if(e.target.closest('.add-btn')) return;
+    if(e.pointerType==='mouse' && e.button !== 0) return;
+
+    var startX = e.clientX, startY = e.clientY;
+    var pointerId = e.pointerId;
+    var dragging = false;
+    var ghost = null;
+    try{ card.setPointerCapture(pointerId); }catch(err){}
+
+    function onMove(ev){
+      if(ev.pointerId !== pointerId) return;
+      var dx = ev.clientX-startX, dy = ev.clientY-startY;
+      if(!dragging){
+        if(Math.abs(dx)+Math.abs(dy) < DRAG_THRESHOLD) return;
+        dragging = true;
+        card.classList.add('dragging');
+        ghost = createGhost(card, card.innerHTML);
+      }
+      ev.preventDefault();
+      ghost.style.left = (ev.clientX - ghost.offsetWidth/2) + 'px';
+      ghost.style.top = (ev.clientY - 28) + 'px';
+      var stageRect = stagePanelEl.getBoundingClientRect();
+      stagePanelEl.classList.toggle('drop-target-active', pointInRect(ev.clientX, ev.clientY, stageRect));
+    }
+    function cleanup(){
+      card.removeEventListener('pointermove', onMove);
+      card.removeEventListener('pointerup', onUp);
+      card.removeEventListener('pointercancel', onUp);
+      card.classList.remove('dragging');
+      stagePanelEl.classList.remove('drop-target-active');
+      if(ghost){ ghost.remove(); ghost=null; }
+    }
+    function onUp(ev){
+      if(ev.pointerId !== pointerId) return;
+      if(dragging){
+        var stageRect = stagePanelEl.getBoundingClientRect();
+        if(pointInRect(ev.clientX, ev.clientY, stageRect)){
+          addIngredient(catId, ing.id, true);
+        }
+      }
+      cleanup();
+    }
+    card.addEventListener('pointermove', onMove);
+    card.addEventListener('pointerup', onUp);
+    card.addEventListener('pointercancel', onUp);
+  });
+}
+
+var dropZone = document.getElementById('dropZone');
+var emptyHint = document.getElementById('emptyHint');
+
+function addIngredient(catId, ingId){
+  var ing = null;
+  for(var i=0;i<INGREDIENTS[catId].length;i++){
+    if(INGREDIENTS[catId][i].id===ingId){ ing = INGREDIENTS[catId][i]; break; }
+  }
+  if(!ing) return;
+  if(catId==='brood'){
+    bread = { id:ing.id, name:ing.name, price:ing.price, emoji:ing.emoji };
+  } else {
+    order.push({ uid:'u'+(uidCounter++), catId:catId, id:ing.id, name:ing.name, price:ing.price, emoji:ing.emoji, color:ing.color });
+  }
+  renderStage();
+  renderOrderRows();
+  renderPrice(true);
+}
+
+function removeFromOrder(uid){
+  order = order.filter(function(o){ return o.uid!==uid; });
+  renderStage();
+  renderOrderRows();
+  renderPrice(true);
+}
+
+function renderStage(){
+  dropZone.innerHTML='';
+  var hasContent = bread || order.length>0;
+  if(!hasContent){
+    dropZone.appendChild(emptyHint);
+    return;
+  }
+  dropZone.appendChild(makeLayer('bread-bottom', bread ? bread.emoji : '🥖', bread ? bread.name : 'Kies je brood'));
+
+  // De stage bouwt van onder naar boven op, de lijst toont van boven naar onder,
+  // dus we stapelen de laagjes in omgekeerde volgorde zodat "bovenaan in de lijst"
+  // ook echt "bovenaan in het broodje" betekent.
+  var reversedOrder = order.slice().reverse();
+  reversedOrder.forEach(function(item){
+    var cat = null;
+    for(var i=0;i<CATEGORIES.length;i++){ if(CATEGORIES[i].id===item.catId){ cat = CATEGORIES[i]; break; } }
+    dropZone.appendChild(makeLayer(cat.layerClass, item.emoji, item.name, item.color));
+  });
+
+  dropZone.appendChild(makeLayer('bread-top', bread ? bread.emoji : '🥖', ''));
+}
+
+function makeLayer(cls, emoji, label, color){
+  var div=document.createElement('div');
+  div.className='layer '+cls;
+  if(color) div.style.background = color;
+  div.title = label;
+  if(label){
+    var em = document.createElement('span');
+    em.className='layer-emoji';
+    em.textContent = emoji;
+    var nm = document.createElement('span');
+    nm.className='layer-name';
+    nm.textContent = label;
+    div.appendChild(em);
+    div.appendChild(nm);
+  } else if(emoji){
+    div.textContent = emoji;
+  }
+  return div;
+}
+
+var orderRowsEl = document.getElementById('orderRows');
+
+function renderOrderRows(){
+  orderRowsEl.innerHTML='';
+  if(order.length===0 && !bread){
+    orderRowsEl.innerHTML = '<div class="order-empty">Nog geen ingrediënten gekozen.</div>';
+    return;
+  }
+  if(bread){
+    var row=document.createElement('div');
+    row.className='order-row';
+    row.style.cursor='default';
+    row.innerHTML =
+      '<span class="handle">🥖</span>'+
+      '<span class="emoji">'+bread.emoji+'</span>'+
+      '<span class="name">'+bread.name+' (brood)</span>'+
+      '<span class="price">€ '+bread.price.toFixed(2).replace('.',',')+'</span>';
+    orderRowsEl.appendChild(row);
+  }
+  order.forEach(function(item){
+    var row=document.createElement('div');
+    row.className='order-row';
+    row.dataset.uid=item.uid;
+    row.innerHTML =
+      '<span class="handle">⠿</span>'+
+      '<span class="emoji">'+item.emoji+'</span>'+
+      '<span class="name">'+item.name+'</span>'+
+      '<span class="price">€ '+item.price.toFixed(2).replace('.',',')+'</span>'+
+      '<button class="remove" aria-label="Verwijder">✕</button>';
+    row.querySelector('.remove').addEventListener('click', function(){ removeFromOrder(item.uid); });
+    attachOrderRowDrag(row, item);
+    orderRowsEl.appendChild(row);
+  });
+}
+
+function attachOrderRowDrag(row, item){
+  row.addEventListener('pointerdown', function(e){
+    if(e.target.closest('.remove')) return;
+    if(e.pointerType==='mouse' && e.button !== 0) return;
+
+    var startX = e.clientX, startY = e.clientY;
+    var pointerId = e.pointerId;
+    var dragging = false;
+    var ghost = null;
+    try{ row.setPointerCapture(pointerId); }catch(err){}
+
+    function findTargetRow(x, y){
+      var rows = Array.prototype.slice.call(orderRowsEl.querySelectorAll('.order-row[data-uid]'));
+      for(var i=0;i<rows.length;i++){
+        if(rows[i]===row) continue;
+        var rect = rows[i].getBoundingClientRect();
+        if(pointInRect(x, y, rect)) return rows[i];
+      }
+      return null;
+    }
+    function clearHints(){
+      var rows = orderRowsEl.querySelectorAll('.order-row.drop-hint');
+      rows.forEach(function(r){ r.classList.remove('drop-hint'); });
+    }
+    function onMove(ev){
+      if(ev.pointerId !== pointerId) return;
+      var dx = ev.clientX-startX, dy = ev.clientY-startY;
+      if(!dragging){
+        if(Math.abs(dx)+Math.abs(dy) < DRAG_THRESHOLD) return;
+        dragging = true;
+        row.classList.add('dragging');
+        ghost = createGhost(row, row.innerHTML, 'order-ghost');
+      }
+      ev.preventDefault();
+      ghost.style.left = (ev.clientX - ghost.offsetWidth/2) + 'px';
+      ghost.style.top = (ev.clientY - 20) + 'px';
+      clearHints();
+      var target = findTargetRow(ev.clientX, ev.clientY);
+      if(target) target.classList.add('drop-hint');
+    }
+    function cleanup(){
+      row.removeEventListener('pointermove', onMove);
+      row.removeEventListener('pointerup', onUp);
+      row.removeEventListener('pointercancel', onUp);
+      row.classList.remove('dragging');
+      clearHints();
+      if(ghost){ ghost.remove(); ghost=null; }
+    }
+    function onUp(ev){
+      if(ev.pointerId !== pointerId) return;
+      if(dragging){
+        var target = findTargetRow(ev.clientX, ev.clientY);
+        if(target){
+          var targetUid = target.dataset.uid;
+          var fromIdx=-1, toIdx=-1;
+          for(var i=0;i<order.length;i++){
+            if(order[i].uid===item.uid) fromIdx=i;
+            if(order[i].uid===targetUid) toIdx=i;
+          }
+          if(fromIdx>=0 && toIdx>=0){
+            var moved = order.splice(fromIdx,1)[0];
+            order.splice(toIdx,0,moved);
+            renderStage();
+            renderOrderRows();
+          }
+        }
+      }
+      cleanup();
+    }
+    row.addEventListener('pointermove', onMove);
+    row.addEventListener('pointerup', onUp);
+    row.addEventListener('pointercancel', onUp);
+  });
+}
+
+var priceRowsEl = document.getElementById('priceRows');
+var totalAmountEl = document.getElementById('totalAmount');
+var orderBtn = document.getElementById('orderBtn');
+
+function renderPrice(bump){
+  priceRowsEl.innerHTML='';
+  var total = 0;
+  if(bread){
+    total += bread.price;
+    var r=document.createElement('div');
+    r.className='price-row';
+    r.innerHTML = '<span>'+bread.emoji+' '+bread.name+'</span><span>€ '+bread.price.toFixed(2).replace('.',',')+'</span>';
+    priceRowsEl.appendChild(r);
+  }
+  var byCat = {};
+  order.forEach(function(o){
+    if(!byCat[o.catId]){
+      var catInfo = null;
+      for(var i=0;i<CATEGORIES.length;i++){ if(CATEGORIES[i].id===o.catId){ catInfo=CATEGORIES[i]; break; } }
+      byCat[o.catId] = { count:0, total:0, label:catInfo.label, tab:catInfo.tab };
+    }
+    byCat[o.catId].count++;
+    byCat[o.catId].total += o.price;
+    total += o.price;
+  });
+  Object.keys(byCat).forEach(function(key){
+    var c = byCat[key];
+    var r=document.createElement('div');
+    r.className='price-row';
+    r.innerHTML = '<span>'+c.tab+' '+c.label+' ×'+c.count+'</span><span>€ '+c.total.toFixed(2).replace('.',',')+'</span>';
+    priceRowsEl.appendChild(r);
+  });
+  totalAmountEl.textContent = '€ ' + total.toFixed(2).replace('.',',');
+  if(bump){
+    totalAmountEl.classList.add('bump');
+    setTimeout(function(){ totalAmountEl.classList.remove('bump'); }, 250);
+  }
+  orderBtn.disabled = !bread;
+}
+
+var firestoreReady = false;
+var firestoreError = null;
+var dbRef = null;
+(function initFirebase(){
+  try{
+    var s1 = document.createElement('script');
+    s1.type = 'module';
+    s1.textContent =
+      "import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';" +
+      "import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';" +
+      "window.__achielieFirebase = { initializeApp: initializeApp, getFirestore: getFirestore, collection: collection, addDoc: addDoc, serverTimestamp: serverTimestamp, query: query, orderBy: orderBy, onSnapshot: onSnapshot, getDocs: getDocs };" +
+      "window.dispatchEvent(new Event('achielie-firebase-ready'));";
+    s1.onerror = function(err){
+      firestoreError = 'Kon de Firebase-module niet laden (netwerk/CDN-probleem).';
+      console.error(firestoreError, err);
+    };
+    document.head.appendChild(s1);
+    window.addEventListener('achielie-firebase-ready', function(){
+      try{
+        var fb = window.__achielieFirebase;
+        var firebaseConfig = {
+          apiKey: "AIzaSyBWzEbqBZ7bZHgqpfYYsLX4WYCsKsim9Ek",
+          authDomain: "achilie-s-broodjes.firebaseapp.com",
+          projectId: "achilie-s-broodjes",
+          storageBucket: "achilie-s-broodjes.firebasestorage.app",
+          messagingSenderId: "1071097635871",
+          appId: "1:1071097635871:web:6540c30836971b283ba12a"
+        };
+        var app = fb.initializeApp(firebaseConfig);
+        dbRef = {
+          db: fb.getFirestore(app),
+          collection: fb.collection,
+          addDoc: fb.addDoc,
+          serverTimestamp: fb.serverTimestamp,
+          query: fb.query,
+          orderBy: fb.orderBy,
+          onSnapshot: fb.onSnapshot,
+          getDocs: fb.getDocs
+        };
+        firestoreReady = true;
+        window.dispatchEvent(new Event('achielie-firestore-ready'));
+      }catch(err){
+        firestoreError = 'Firestore kon niet initialiseren: ' + (err && err.message ? err.message : err);
+        console.warn(firestoreError, err);
+      }
+    });
+  }catch(err){
+    firestoreError = 'Firestore niet bereikbaar in deze omgeving.';
+    console.warn(firestoreError, err);
+  }
+})();
+
+var toast = document.getElementById('toast');
+orderBtn.addEventListener('click', function(){
+  if(!bread) return;
+  orderBtn.disabled = true;
+  var label = orderBtn.textContent;
+  orderBtn.textContent = '⏳ Bezig...';
+
+  var totalText = totalAmountEl.textContent;
+  var payload = {
+    bread: bread,
+    items: order.map(function(o){ return { catId:o.catId, id:o.id, name:o.name, price:o.price, emoji:o.emoji }; }),
+    total: totalText,
+    createdAt: new Date().toISOString()
+  };
+
+  var finish = function(savedRemotely){
+    var msg = savedRemotely
+      ? '✅ Bestelling geplaatst! Smakelijk — ' + totalText
+      : '⚠️ Bestelling lokaal bevestigd (niet opgeslagen in Firestore) — ' + totalText;
+    showToast(msg);
+    bread = null;
+    order = [];
+    renderStage();
+    renderOrderRows();
+    renderPrice(false);
+    orderBtn.textContent = label;
+  };
+
+  if(firestoreReady && dbRef){
+    dbRef.addDoc(dbRef.collection(dbRef.db,'orders'), Object.assign({}, payload, { serverTime: dbRef.serverTimestamp() }))
+      .then(function(){ finish(true); })
+      .catch(function(err){
+        console.warn('Bestelling kon niet naar Firestore geschreven worden, lokaal bevestigd.', err);
+        finish(false);
+      });
+  } else {
+    console.warn('Firestore was niet klaar toen de bestelling geplaatst werd.', firestoreError);
+    finish(false);
+  }
+});
+
+function showToast(msg){
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(function(){ toast.classList.remove('show'); }, 3200);
+}
+
+// ---- Admin paneel (pincode 0301) ----
+var ADMIN_PIN = '0301';
+var adminToggle = document.getElementById('adminToggle');
+var pinOverlay = document.getElementById('pinOverlay');
+var pinInput = document.getElementById('pinInput');
+var pinError = document.getElementById('pinError');
+var pinSubmit = document.getElementById('pinSubmit');
+var pinCancel = document.getElementById('pinCancel');
+var adminOverlay = document.getElementById('adminOverlay');
+var adminClose = document.getElementById('adminClose');
+var adminStatusEl = document.getElementById('adminStatus');
+var adminOrdersEl = document.getElementById('adminOrders');
+var adminUnsub = null;
+
+function openPinModal(){
+  pinInput.value='';
+  pinError.textContent='';
+  pinOverlay.classList.add('show');
+  setTimeout(function(){ pinInput.focus(); }, 50);
+}
+function closePinModal(){ pinOverlay.classList.remove('show'); }
+
+function checkPin(){
+  if(pinInput.value === ADMIN_PIN){
+    closePinModal();
+    openAdminPanel();
+  } else {
+    pinError.textContent = 'Onjuiste pincode.';
+    pinInput.value='';
+    pinInput.focus();
+  }
+}
+
+adminToggle.addEventListener('click', openPinModal);
+pinCancel.addEventListener('click', closePinModal);
+pinSubmit.addEventListener('click', checkPin);
+pinInput.addEventListener('keydown', function(e){ if(e.key==='Enter') checkPin(); });
+pinOverlay.addEventListener('click', function(e){ if(e.target===pinOverlay) closePinModal(); });
+
+function openAdminPanel(){
+  adminOverlay.classList.add('show');
+  renderAdminStatus();
+  attachAdminListener();
+}
+function closeAdminPanel(){
+  adminOverlay.classList.remove('show');
+  if(adminUnsub){ adminUnsub(); adminUnsub=null; }
+}
+adminClose.addEventListener('click', closeAdminPanel);
+adminOverlay.addEventListener('click', function(e){ if(e.target===adminOverlay) closeAdminPanel(); });
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape'){ closePinModal(); closeAdminPanel(); }
+});
+
+function renderAdminStatus(){
+  if(firestoreReady && dbRef){
+    adminStatusEl.textContent = 'Verbonden met Firestore — live overzicht.';
+  } else if(firestoreError){
+    adminStatusEl.textContent = '⚠️ ' + firestoreError;
+  } else {
+    adminStatusEl.textContent = 'Verbinden met Firestore...';
+  }
+}
+
+function attachAdminListener(){
+  if(adminUnsub){ adminUnsub(); adminUnsub=null; }
+  if(!(firestoreReady && dbRef)){
+    // Firestore nog niet klaar: probeer opnieuw zodra het klaar is
+    window.addEventListener('achielie-firestore-ready', function onReady(){
+      window.removeEventListener('achielie-firestore-ready', onReady);
+      if(adminOverlay.classList.contains('show')){
+        renderAdminStatus();
+        attachAdminListener();
+      }
+    });
+    renderAdminOrders([]);
+    return;
+  }
+  try{
+    var q = dbRef.query(dbRef.collection(dbRef.db,'orders'), dbRef.orderBy('serverTime','desc'));
+    adminUnsub = dbRef.onSnapshot(q, function(snapshot){
+      var docs = [];
+      snapshot.forEach(function(d){ docs.push(d.data()); });
+      renderAdminStatus();
+      renderAdminOrders(docs);
+    }, function(err){
+      console.warn('Live overzicht mislukt, val terug op eenmalige ophaling.', err);
+      dbRef.getDocs(q).then(function(snapshot){
+        var docs = [];
+        snapshot.forEach(function(d){ docs.push(d.data()); });
+        renderAdminOrders(docs);
+      }).catch(function(err2){
+        adminStatusEl.textContent = '⚠️ Bestellingen konden niet geladen worden: ' + (err2 && err2.message ? err2.message : err2);
+      });
+    });
+  }catch(err){
+    adminStatusEl.textContent = '⚠️ Bestellingen konden niet geladen worden: ' + (err && err.message ? err.message : err);
+  }
+}
+
+function renderAdminOrders(docs){
+  adminOrdersEl.innerHTML='';
+  if(!docs || docs.length===0){
+    adminOrdersEl.innerHTML = '<div class="admin-order-empty">Nog geen bestellingen ontvangen.</div>';
+    return;
+  }
+  docs.forEach(function(o){
+    var row = document.createElement('div');
+    row.className='admin-order';
+    var timeLabel = '';
+    if(o.serverTime && typeof o.serverTime.toDate === 'function'){
+      timeLabel = o.serverTime.toDate().toLocaleString('nl-BE');
+    } else if(o.createdAt){
+      timeLabel = new Date(o.createdAt).toLocaleString('nl-BE');
+    }
+    var itemsText = (o.bread ? o.bread.emoji+' '+o.bread.name : '') +
+      (o.items && o.items.length ? ' · ' + o.items.map(function(i){ return i.emoji+' '+i.name; }).join(', ') : '');
+    row.innerHTML =
+      '<div class="admin-order-top">'+
+        '<span class="admin-order-time">'+timeLabel+'</span>'+
+        '<span class="admin-order-total">'+(o.total || '')+'</span>'+
+      '</div>'+
+      '<div class="admin-order-items">'+itemsText+'</div>';
+    adminOrdersEl.appendChild(row);
+  });
+}
+
+renderTabs();
+renderIngredients();
+renderStage();
+renderOrderRows();
+renderPrice(false);
+
+})();
+</script>
+</body>
+</html>
